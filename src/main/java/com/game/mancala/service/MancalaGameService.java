@@ -1,4 +1,4 @@
-package com.game.mancala;
+package com.game.mancala.service;
 
 import com.game.mancala.enums.PlayerNumber;
 import com.game.mancala.enums.Status;
@@ -7,7 +7,7 @@ import com.game.mancala.model.Pit;
 import com.game.mancala.model.Player;
 import lombok.Getter;
 
-public class MancalaGame {
+public class MancalaGameService {
     //Improvement: assign UUID for each games
 
     private final Board board;
@@ -16,7 +16,7 @@ public class MancalaGame {
 
     private Player player;
 
-    public MancalaGame(int numOfSeeds, int numOfHouses) {
+    public MancalaGameService(int numOfSeeds, int numOfHouses) {
         Board board = new Board(numOfSeeds, numOfHouses);
         this.board = board;
         this.status = Status.ACTIVE;
@@ -28,25 +28,24 @@ public class MancalaGame {
     /**
      * This method checks for validation of moves and add seeds to the respective pits (if applicable to the player)
      * The status of Game is set to non-active indicating game to end. The set of status details can be found in Status enum
-     * @param playerNumber
-     * @param houseNumber
+     * @param playerNumber: current Player
+     * @param houseNumber: House selected by Current Player
      * @return
      */
     public Response makeMove(PlayerNumber playerNumber, int houseNumber) {
-        if (!player.playerNumber().equals(playerNumber)) {
+        if (!player.playerNumber().equals(playerNumber)) { // check if current player selects his/her own house
             this.status = Status.INVALID_PLAYER_MOVE;
         }
-        else if (player.hasNoSeeds()) {
-            this.status = declareWinner();
-            //TODO: empty other player pits
-            System.out.println(this.status);
+        else if (player.isHouseEmpty(houseNumber)) { //check if selected house has any seed
+            this.status = Status.NO_SEEDS_IN_THE_HOUSE;
         } else {
-            Pit lastPit = player.makeMove(houseNumber);
-            if (lastPit.count() == 0) {
-                this.status = Status.NO_SEEDS_IN_THE_HOUSE;
-            } else {
-                player = switchTurn(lastPit);
+            Pit lastSowedPit = player.makeMove(houseNumber);
+            if (player.areAllHousesEmpty()) { // check if all houses have 0 seeds, if yes declare winner
+                this.status = declareWinner();
+                //TODO: empty other player pits
+                System.out.println(this.status);
             }
+            player = switchTurn(lastSowedPit);
         }
 
         return new Response(status, player.playerNumber(), board);

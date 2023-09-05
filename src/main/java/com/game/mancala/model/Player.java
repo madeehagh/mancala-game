@@ -5,6 +5,12 @@ import com.game.mancala.enums.PlayerNumber;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**The record here contains all logic and rules for the moves of a player
+ *
+ * @param playerNumber Player Number 1 or 2. Identifies which player is playing currently
+ * @param houses List of Houses associated with the player
+ * @param store Store associated with the player
+ */
 public record Player(PlayerNumber playerNumber, List<House> houses, Store store) {
 
     public Pit makeMove(int houseNumber) {
@@ -12,9 +18,7 @@ public record Player(PlayerNumber playerNumber, List<House> houses, Store store)
         if (!checkHasSeeds(house))
             return house;
 
-        Pit pit = takeTurn(house);
-
-        return pit;
+        return takeTurn(house);
     }
 
     private Pit takeTurn(House house) {
@@ -56,11 +60,15 @@ public record Player(PlayerNumber playerNumber, List<House> houses, Store store)
     }
 
     public int getScore(){
-        return store.count();
+        return this.store.count();
     }
 
-    public boolean hasNoSeeds() {
+    public boolean areAllHousesEmpty() {
         Predicate<House> emptyHouse = house -> house.count() == 0;
-        return houses.stream().allMatch(emptyHouse);
+        return this.houses.stream().allMatch(emptyHouse);
+    }
+
+    public boolean isHouseEmpty(int houseNumber) {
+        return this.houses.get(houseNumber -1 ).count() == 0;
     }
 }

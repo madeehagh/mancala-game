@@ -1,6 +1,7 @@
 package com.game.mancala.model;
 
 import com.game.mancala.enums.PlayerNumber;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
@@ -16,8 +17,12 @@ import static org.junit.Assert.assertThrows;
 @SpringBootTest
 public class PlayerTest {
 
-    House houseOfPlayer1 = new House(PlayerNumber.ONE, 0);
+    House houseOfPlayer1;
 
+    @Before
+    public void setUp() {
+        houseOfPlayer1 = new House(PlayerNumber.ONE, 0);
+    }
 
     @Test
     @DisplayName("Test Player should not be able to choose empty House")

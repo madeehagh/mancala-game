@@ -1,4 +1,4 @@
-package com.game.mancala;
+package com.game.mancala.service;
 
 import com.game.mancala.enums.PlayerNumber;
 import com.game.mancala.enums.Status;
@@ -14,33 +14,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class MancalaGameTest {
+public class MancalaGameServiceTest {
 
-    MancalaGame mancalaGame;
+    MancalaGameService mancalaGameService;
     int numOfSeeds = 2;
     int numOfHouses = 4;
     @Before
     public void setUp() {
-        this.mancalaGame = new MancalaGame(numOfSeeds, numOfHouses);
+        this.mancalaGameService = new MancalaGameService(numOfSeeds, numOfHouses);
     }
 
     @Test
     @DisplayName("Test Player ONE should always make the first move")
     public void playerOneShouldTakeFirstTurn() {
-        Player player = this.mancalaGame.getCurrentPlayer();
+        Player player = this.mancalaGameService.getCurrentPlayer();
         assertThat(player.playerNumber()).isEqualTo(PlayerNumber.ONE);
     }
 
     @Test
     public void inActivePlayerShouldNotBeAllowedForMOve() {
-        MancalaGame.Response response = this.mancalaGame.makeMove(PlayerNumber.TWO, 1);
+        MancalaGameService.Response response = this.mancalaGameService.makeMove(PlayerNumber.TWO, 1);
         assertThat(response.status()).isEqualTo(Status.INVALID_PLAYER_MOVE);
     }
 
     @Test
     @DisplayName("Current Player should be able to add seeds in his/her pits")
     public void playerCanSowSeed() {
-        MancalaGame.Response response = this.mancalaGame.makeMove(PlayerNumber.ONE, 1);
+        MancalaGameService.Response response = this.mancalaGameService.makeMove(PlayerNumber.ONE, 1);
         assertThat(response.board().getHouses().get(2).count()).isEqualTo(numOfSeeds+1);
         assertThat(response.status()).isEqualTo(Status.ACTIVE);
     }
@@ -48,7 +48,7 @@ public class MancalaGameTest {
     @Test
     @DisplayName("Current Player should get Bonus Chance when last seed lands up in Store")
     public void playerGetsBonusChanceWhenLandsInStore(){
-        MancalaGame.Response response = this.mancalaGame.makeMove(PlayerNumber.ONE, 3);
+        MancalaGameService.Response response = this.mancalaGameService.makeMove(PlayerNumber.ONE, 3);
         assertThat(response.nextPlayer()).isEqualTo(PlayerNumber.ONE);
         assertThat(response.status()).isEqualTo(Status.ACTIVE);
     }
@@ -56,7 +56,7 @@ public class MancalaGameTest {
     @Test
     @DisplayName("Opposite Player should get chance for next move if that last seed doesn't land in player's store")
     public void oppositePlayerShouldGetChanceForNextMove(){
-        MancalaGame.Response response = this.mancalaGame.makeMove(PlayerNumber.ONE, 2);
+        MancalaGameService.Response response = this.mancalaGameService.makeMove(PlayerNumber.ONE, 2);
         assertThat(response.status()).isEqualTo(Status.ACTIVE);
         assertThat(response.nextPlayer()).isEqualTo(PlayerNumber.TWO);
     }
@@ -73,10 +73,10 @@ public class MancalaGameTest {
     **//*
     @DisplayName("Capture Opponent's seed if next House is Empty")
     public void captureOpponentsSeedWhenEmptyHouse(){
-        MancalaGame.Response response = this.mancalaGame.makeMove(PlayerNumber.ONE,    4); //Player 1
+        MancalaGameService.Response response = this.mancalaGameService.makeMove(PlayerNumber.ONE,    4); //Player 1
 
         System.out.println("Next turn "+ response.nextPlayer());
-        response = this.mancalaGame.makeMove(response.nextPlayer(), 3); //Player 2
+        response = this.mancalaGameService.makeMove(response.nextPlayer(), 3); //Player 2
         assertThat(response.board().getStores().get(0)).isEqualTo(2);
         assertThat(response.board().getHouses().get(5)).isEqualTo(0); //seeds in opponent's house
         assertThat(response.board().getHouses().get(3)).isEqualTo(0); //seeds in current player's house
